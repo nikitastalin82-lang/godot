@@ -1,3 +1,4 @@
+@tool
 extends CharacterBody3D
 ## Контроллер игрока v2.
 ## - AnimationTree (машина состояний + BlendSpace1D для idle/walk/run), собирается кодом
@@ -123,6 +124,9 @@ var _afk_threshold := 10.0
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		_apply_editor_preview_pose.call_deferred()
+		return
 	add_to_group(&"player")
 	_touch_mode = DisplayServer.is_touchscreen_available() or force_touch_mode
 
@@ -143,6 +147,57 @@ func _ready() -> void:
 
 	if not _touch_mode:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+
+## В редакторе применяем ту же вертикальную rest-позу таза, которую игра
+## выставляет при запуске. Это только предпросмотр: физика и коллайдер не меняются.
+func _apply_editor_preview_pose() -> void:
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return
+	var model_node := get_node_or_null("animation") as Node3D
+	if model_node == null:
+		return
+	var skeleton := model_node.find_child("Skeleton3D", true, false) as Skeleton3D
+	if skeleton == null:
+		return
+	var source_scene := load("res://анимки/стойка.fbx") as PackedScene
+	if source_scene == null:
+		return
+	var source := source_scene.instantiate()
+	var source_player := source.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	var source_skeleton := source.find_child("Skeleton3D", true, false) as Skeleton3D
+	if source_player == null or source_skeleton == null:
+		source.free()
+		return
+	var clip: Animation
+	for anim_name in source_player.get_animation_list():
+		if anim_name != &"RESET":
+			clip = source_player.get_animation(anim_name)
+			break
+	if clip == null:
+		source.free()
+		return
+	var bone_map := _build_bone_map()
+	for track_index in clip.get_track_count():
+		if clip.track_get_type(track_index) != Animation.TYPE_ROTATION_3D:
+			continue
+		var track_path := clip.track_get_path(track_index)
+		if track_path.get_subname_count() == 0 or clip.track_get_key_count(track_index) == 0:
+			continue
+		var source_bone := String(track_path.get_subname(track_path.get_subname_count() - 1))
+		var target_bone: String = bone_map.get(source_bone.trim_prefix("mixamorig_"), "")
+		if target_bone != "pelvis":
+			continue
+		var bone_index := skeleton.find_bone(target_bone)
+		if bone_index < 0:
+			continue
+		var rest := skeleton.get_bone_rest(bone_index)
+		rest.basis = Basis(clip.track_get_key_value(track_index, 0) as Quaternion)
+		skeleton.set_bone_rest(bone_index, rest)
+		skeleton.reset_bone_pose(bone_index)
+		break
+	source.free()
 
 
 # ------------------------------------------------------------------ Камера / ввод
