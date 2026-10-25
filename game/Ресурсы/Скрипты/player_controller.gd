@@ -229,7 +229,21 @@ func _read_move_input() -> Vector2:
 		var stick: Vector2 = _touch.move_vector
 		if stick.length_squared() > 0.0001:
 			return stick
-	return Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+
+	# Сначала используем InputMap. Прямое чтение физических клавиш оставлено
+	# как резерв: это помогает при несовпадении device ID клавиатуры между
+	# версиями Godot (в 4.7 клавиатура получила отдельный ID 16).
+	var mapped := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	if mapped.length_squared() > 0.0001:
+		return mapped
+
+	var keyboard := Vector2(
+		float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))
+			- float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)),
+		float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))
+			- float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP))
+	)
+	return keyboard.limit_length(1.0)
 
 
 func _wants_run(input_dir: Vector2) -> bool:
