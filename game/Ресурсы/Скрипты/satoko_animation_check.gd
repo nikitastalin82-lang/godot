@@ -2,12 +2,14 @@ extends Node3D
 
 const SATOKO_SCENE_PATH := "res://Ресурсы/Модели/Персонажи/satoko.glb"
 const UAL_SCENE_PATH := "res://Ресурсы/Анимации/UAL1_Standard.glb"
+const REFERENCE_ANIMATION_CANDIDATES := ["Idle_Loop", "Idle", "Idle_Breathing"]
 
 var satoko_instance: Node3D
 var ual_instance: Node3D
 
+
 func _ready() -> void:
-	print("\n========== SATOKO ANIMATION CHECK ==========")
+	print("\n========== SATOKO / UAL RETARGET DIAGNOSTIC ==========")
 	var satoko_packed := load(SATOKO_SCENE_PATH) as PackedScene
 	if satoko_packed == null:
 		push_error("Не найдена модель Сатоко: " + SATOKO_SCENE_PATH)
@@ -15,7 +17,7 @@ func _ready() -> void:
 
 	var ual_packed := load(UAL_SCENE_PATH) as PackedScene
 	if ual_packed == null:
-		push_error("Не найдена библиотека UAL1. Скопируй UAL1_Standard.glb в: " + UAL_SCENE_PATH)
+		push_error("Не найдена библиотека UAL1: " + UAL_SCENE_PATH)
 		return
 
 	satoko_instance = satoko_packed.instantiate() as Node3D
@@ -26,55 +28,37 @@ func _ready() -> void:
 
 	add_child(satoko_instance)
 	add_child(ual_instance)
-	satoko_instance.position = Vector3(-1.2, 0.0, 0.0)
-	ual_instance.position = Vector3(1.2, 0.0, 0.0)
-	ual_instance.visible = false
+	satoko_instance.position = Vector3(-1.5, 0.0, 0.0)
+	ual_instance.position = Vector3(1.5, 0.0, 0.0)
+	satoko_instance.name = "Satoko_Original"
+	ual_instance.name = "UAL_Reference"
 
 	var satoko_skeleton := _find_skeleton(satoko_instance)
 	var ual_skeleton := _find_skeleton(ual_instance)
 	var ual_player := _find_animation_player(ual_instance)
 
-	if satoko_skeleton == null:
-		push_error("В модели Сатоко не найден Skeleton3D.")
-		return
-	if ual_skeleton == null:
-		push_error("В UAL1 не найден Skeleton3D.")
+	if satoko_skeleton == null or ual_skeleton == null:
+		push_error("Не найден Skeleton3D в одной из моделей.")
 		return
 	if ual_player == null:
 		push_error("В UAL1 не найден AnimationPlayer.")
 		return
 
-	var satoko_bones := _bone_names(satoko_skeleton)
-	var ual_bones := _bone_names(ual_skeleton)
-	var matched := 0
-	var missing: Array[String] = []
-	for bone_name in ual_bones:
-		if satoko_bones.has(bone_name):
-			matched += 1
-		else:
-			missing.append(bone_name)
+	_report_skeleton("SATOKO", satoko_skeleton)
+	_report_skeleton("UAL1", ual_skeleton)
+	_compare_skeletons(satoko_skeleton, ual_skeleton)
+	_report_animation_tracks(ual_player)
 
-	print("Satoko skeleton: ", satoko_skeleton.get_path())
-	print("Satoko bones: ", satoko_bones.size())
-	print("UAL1 bones: ", ual_bones.size())
-	print("Exact bone-name matches: ", matched, "/", ual_bones.size())
-	print("UAL bones missing on Satoko: ", missing)
-	print("Animation clips found: ", ual_player.get_animation_list().size())
+	var chosen_animation := _find_reference_animation(ual_player)
+	if chosen_animation.is_empty():
+		push_warning("Не нашёл Idle-клип для демонстрации. Смотри список CLIP выше.")
+	else:
+		ual_player.play(chosen_animation)
+		print("На эталонной модели UAL запущена анимация: ", chosen_animation)
 
-	for animation_name in ual_player.get_animation_list():
-		var animation := ual_player.get_animation(animation_name)
-		var bone_tracks: Array[String] = []
-		for track_index in animation.get_track_count():
-			var track_path := animation.track_get_path(track_index)
-			if String(track_path).contains(":"):
-				bone_tracks.append(String(track_path))
-		print("CLIP: ", animation_name, " | tracks: ", animation.get_track_count(),
-			" | bone/property paths: ", bone_tracks.size())
-		for path in bone_tracks:
-			print("  ", path)
-
-	print("Проверка завершена. Исходная модель не изменялась.")
-	print("===========================================\n")
+	print("ВАЖНО: это диагностика исходных скелетов, НЕ ретаргетинг.")
+	print("Сатоко оставлена без изменений; UAL показана рядом как эталон.")
+	print("=====================================================\n")
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
@@ -97,8 +81,68 @@ func _find_animation_player(root: Node) -> AnimationPlayer:
 	return null
 
 
-func _bone_names(skeleton: Skeleton3D) -> Array[String]:
-	var result: Array[String] = []
+func _report_skeleton(label: String, skeleton: Skeleton3D) -> void:
+	print("\n[", label, "] bones=", skeleton.get_bone_count(),
+		" motion_scale=", skeleton.motion_scale)
 	for index in skeleton.get_bone_count():
-		result.append(skeleton.get_bone_name(index))
-	return result
+		var parent_index := skeleton.get_bone_parent(index)
+		var parent_name := "<root>" if parent_index < 0 else skeleton.get_bone_name(parent_index)
+		var rest := skeleton.get_bone_rest(index)
+		print("BONE ", skeleton.get_bone_name(index),
+			" | parent=", parent_name,
+			" | rest_origin=", rest.origin,
+			" | rest_basis=", rest.basis)
+
+
+func _compare_skeletons(satoko: Skeleton3D, source: Skeleton3D) -> void:
+	var satoko_names: Array[String] = []
+	for i in satoko.get_bone_count():
+		satoko_names.append(String(satoko.get_bone_name(i)))
+
+	var exact_matches := 0
+	var missing: Array[String] = []
+	var parent_mismatches: Array[String] = []
+	for i in source.get_bone_count():
+		var source_name := String(source.get_bone_name(i))
+		var target_index := satoko.find_bone(source_name)
+		if target_index < 0:
+			missing.append(source_name)
+			continue
+		exact_matches += 1
+		var source_parent := source.get_bone_parent(i)
+		var target_parent := satoko.get_bone_parent(target_index)
+		var source_parent_name := "" if source_parent < 0 else String(source.get_bone_name(source_parent))
+		var target_parent_name := "" if target_parent < 0 else String(satoko.get_bone_name(target_parent))
+		if source_parent_name != target_parent_name:
+			parent_mismatches.append("%s: UAL parent=%s / Satoko parent=%s" % [
+				source_name, source_parent_name, target_parent_name
+			])
+
+	print("\n[COMPARISON]")
+	print("Exact bone-name matches: ", exact_matches, "/", source.get_bone_count())
+	print("Source bones absent on Satoko: ", missing)
+	print("Parent hierarchy mismatches: ", parent_mismatches)
+	print("Note: matching names/hierarchy do not prove matching Bone Rest transforms.")
+
+
+func _report_animation_tracks(player: AnimationPlayer) -> void:
+	print("\n[ANIMATIONS] clips=", player.get_animation_list().size())
+	for animation_name in player.get_animation_list():
+		var animation := player.get_animation(animation_name)
+		var bone_tracks: Array[String] = []
+		for track_index in animation.get_track_count():
+			var track_path := String(animation.track_get_path(track_index))
+			if track_path.contains(":"):
+				bone_tracks.append(track_path)
+		print("CLIP: ", animation_name, " | tracks=", animation.get_track_count(),
+			" | bone/property paths=", bone_tracks.size())
+
+
+func _find_reference_animation(player: AnimationPlayer) -> StringName:
+	for candidate in REFERENCE_ANIMATION_CANDIDATES:
+		if player.has_animation(candidate):
+			return StringName(candidate)
+	for animation_name in player.get_animation_list():
+		if String(animation_name).to_lower().contains("idle"):
+			return animation_name
+	return &""
