@@ -44,6 +44,9 @@ jobs:
       - name: Import project assets
         run: godot --headless --editor --path game --quit
 
+      - name: Diagnose Satoko idle skeleton and animation tracks
+        run: godot --headless --path game --scene "res://Ресурсы/Сцены/satoko_animation_check.tscn" --quit-after 2
+
       - name: Export Web build
         run: |
           mkdir -p game/build/web
