@@ -55,7 +55,7 @@ func _build_bone_map() -> Dictionary:
 		"HeadTop_End": "head_leaf"
 	}
 	for side in ["Left", "Right"]:
-		var suffix := "l" if side == "Left" else "r"
+		var suffix: String = "l" if side == "Left" else "r"
 		result[side + "Shoulder"] = "clavicle_" + suffix
 		result[side + "Arm"] = "upperarm_" + suffix
 		result[side + "ForeArm"] = "lowerarm_" + suffix
@@ -66,13 +66,13 @@ func _build_bone_map() -> Dictionary:
 		result[side + "ToeBase"] = "ball_" + suffix
 		result[side + "Toe_End"] = "ball_leaf_" + suffix
 		for finger in ["Thumb", "Index", "Middle", "Ring", "Pinky"]:
-			var finger_name := finger.to_lower()
+			var finger_name: String = String(finger).to_lower()
 			for segment in range(1, 5):
-				var segment_name := "%02d" % segment
-				var target_name := finger_name + "_" + segment_name
+				var segment_name: String = "%02d" % segment
+				var target_name: String = finger_name + "_" + segment_name
 				if segment == 4:
 					target_name += "_leaf"
-				result[side + "Hand" + finger + str(segment)] = target_name + "_" + suffix
+				result[side + "Hand" + String(finger) + str(segment)] = target_name + "_" + suffix
 	return result
 
 
