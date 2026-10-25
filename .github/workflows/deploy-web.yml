@@ -26,6 +26,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install download utilities
+        run: |
+          apt-get update
+          apt-get install -y curl unzip
+
       - name: Install matching Godot export templates
         run: |
           mkdir -p /tmp/godot-templates
