@@ -26,6 +26,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install matching Godot export templates
+        run: |
+          mkdir -p /tmp/godot-templates
+          curl -L --fail --retry 3 \
+            https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz \
+            -o /tmp/godot-templates/export_templates.tpz
+          unzip -q /tmp/godot-templates/export_templates.tpz -d /tmp/godot-templates
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.6.1.stable"
+          cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.6.1.stable/"
+
       - name: Import project assets
         run: godot --headless --editor --path game --quit
 
