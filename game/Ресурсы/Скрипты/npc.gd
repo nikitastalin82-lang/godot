@@ -108,7 +108,10 @@ func _play_idle() -> void:
 	var bone_map := _build_bone_map()
 	var mapped := 0
 	var unmapped: Array[String] = []
-	var skeleton_path := _animation_player.get_path_to(skeleton)
+	var animation_root := _animation_player.get_node_or_null(_animation_player.root_node) as Node
+	if animation_root == null:
+		animation_root = _animation_player
+	var skeleton_path := animation_root.get_path_to(skeleton)
 	for i in range(target_clip.get_track_count()):
 		var old_path := String(target_clip.track_get_path(i))
 		var colon := old_path.rfind(":")
@@ -131,8 +134,10 @@ func _play_idle() -> void:
 	if not unmapped.is_empty():
 		push_warning("NPC %s: skipped unmapped bones: %s" % [npc_name, ", ".join(unmapped)])
 
-	var library := _animation_player.get_animation_library(&"")
-	if library == null:
+	var library: AnimationLibrary
+	if _animation_player.has_animation_library(&""):
+		library = _animation_player.get_animation_library(&"")
+	else:
 		library = AnimationLibrary.new()
 		_animation_player.add_animation_library(&"", library)
 	if library.has_animation(&"satoko_idle"):
