@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dbjbkfm7thnb2" path="res://Ресурсы/Сцены/village.tscn" id="3_village"]
 [ext_resource type="PackedScene" path="res://Ресурсы/Сцены/outskirts.tscn" id="4_outskirts"]
 [ext_resource type="Script" uid="uid://cxt7r65vogly3" path="res://Ресурсы/Скрипты/terrain.gd" id="5_terrain"]
+[ext_resource type="PackedScene" path="res://Ресурсы/Сцены/npcs.tscn" id="6_npcs"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jdy72"]
 radius = 0.35
@@ -62,3 +63,5 @@ environment = SubResource("Environment_1e0w5")
 [node name="Village" parent="." unique_id=1937978328 instance=ExtResource("3_village")]
 
 [node name="Outskirts" parent="." unique_id=1737716275 instance=ExtResource("4_outskirts")]
+
+[node name="Npcs" parent="." instance=ExtResource("6_npcs")]
