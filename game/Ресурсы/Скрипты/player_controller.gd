@@ -178,7 +178,15 @@ func _apply_editor_preview_pose() -> void:
 	if clip == null:
 		source.free()
 		return
-	var bone_map := _build_bone_map()
+	# Находим кость таза по имени непосредственно в целевом скелете.
+	var hips_bone_index := -1
+	for bone_index in skeleton.get_bone_count():
+		if skeleton.get_bone_name(bone_index).to_lower().contains("hips"):
+			hips_bone_index = bone_index
+			break
+	if hips_bone_index < 0:
+		source.free()
+		return
 	for track_index in clip.get_track_count():
 		if clip.track_get_type(track_index) != Animation.TYPE_ROTATION_3D:
 			continue
@@ -186,16 +194,13 @@ func _apply_editor_preview_pose() -> void:
 		if track_path.get_subname_count() == 0 or clip.track_get_key_count(track_index) == 0:
 			continue
 		var source_bone := String(track_path.get_subname(track_path.get_subname_count() - 1))
-		var target_bone: String = bone_map.get(source_bone.trim_prefix("mixamorig_"), "")
-		if target_bone != "pelvis":
+		if not source_bone.to_lower().contains("hips"):
 			continue
-		var bone_index := skeleton.find_bone(target_bone)
-		if bone_index < 0:
-			continue
-		var rest := skeleton.get_bone_rest(bone_index)
-		rest.basis = Basis(clip.track_get_key_value(track_index, 0) as Quaternion)
-		skeleton.set_bone_rest(bone_index, rest)
-		skeleton.reset_bone_pose(bone_index)
+		var rotation: Quaternion = clip.track_get_key_value(track_index, 0)
+		var rest := skeleton.get_bone_rest(hips_bone_index)
+		rest.basis = Basis(rotation)
+		skeleton.set_bone_rest(hips_bone_index, rest)
+		skeleton.reset_bone_pose(hips_bone_index)
 		break
 	source.free()
 
