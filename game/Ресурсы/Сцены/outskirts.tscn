@@ -1,0 +1,196 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Ресурсы/Скрипты/scatter_multimesh.gd" id="1_scatter"]
+[ext_resource type="PackedScene" path="res://Ресурсы/Модели/Деревья/japanese_red_maple.glb" id="2_maple"]
+[ext_resource type="PackedScene" path="res://Ресурсы/Модели/Декорации/low_poly_japan_2.glb" id="3_kit"]
+
+[sub_resource type="BoxShape3D" id="Wall_NS"]
+size = Vector3(240, 30, 2)
+
+[sub_resource type="BoxShape3D" id="Wall_EW"]
+size = Vector3(2, 30, 240)
+
+[node name="Outskirts" type="Node3D"]
+
+[node name="Boundary" type="StaticBody3D" parent="."]
+
+[node name="WallNorth" type="CollisionShape3D" parent="Boundary"]
+position = Vector3(0, 15, -119)
+shape = SubResource("Wall_NS")
+
+[node name="WallSouth" type="CollisionShape3D" parent="Boundary"]
+position = Vector3(0, 15, 119)
+shape = SubResource("Wall_NS")
+
+[node name="WallWest" type="CollisionShape3D" parent="Boundary"]
+position = Vector3(-119, 15, 0)
+shape = SubResource("Wall_EW")
+
+[node name="WallEast" type="CollisionShape3D" parent="Boundary"]
+position = Vector3(119, 15, 0)
+shape = SubResource("Wall_EW")
+
+[node name="Maples" type="Node3D" parent="."]
+
+[node name="MapleNorthW" type="Node3D" parent="Maples"]
+script = ExtResource("1_scatter")
+scene = ExtResource("2_maple")
+area = Rect2(-115, -115, 112, 62)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 5
+height_min = 8.0
+height_max = 11.0
+min_spacing = 8.0
+random_seed = 11
+collision_radius = 0.35
+
+[node name="MapleNorthE" type="Node3D" parent="Maples"]
+script = ExtResource("1_scatter")
+scene = ExtResource("2_maple")
+area = Rect2(3, -115, 112, 62)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 5
+height_min = 8.0
+height_max = 11.0
+min_spacing = 8.0
+random_seed = 12
+collision_radius = 0.35
+
+[node name="MapleWest" type="Node3D" parent="Maples"]
+script = ExtResource("1_scatter")
+scene = ExtResource("2_maple")
+area = Rect2(-115, -53, 67, 100)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 5
+height_min = 8.0
+height_max = 11.0
+min_spacing = 8.0
+random_seed = 13
+collision_radius = 0.35
+
+[node name="MapleEast" type="Node3D" parent="Maples"]
+script = ExtResource("1_scatter")
+scene = ExtResource("2_maple")
+area = Rect2(48, -53, 67, 100)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 5
+height_min = 8.0
+height_max = 11.0
+min_spacing = 8.0
+random_seed = 14
+collision_radius = 0.35
+
+[node name="MapleSouth" type="Node3D" parent="Maples"]
+script = ExtResource("1_scatter")
+scene = ExtResource("2_maple")
+area = Rect2(-115, 22, 230, 93)
+count = 6
+height_min = 8.0
+height_max = 11.0
+min_spacing = 8.0
+random_seed = 15
+collision_radius = 0.35
+
+[node name="BambooGroves" type="Node3D" parent="."]
+
+[node name="BambooNW" type="Node3D" parent="BambooGroves"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Bamboo_2A"
+area = Rect2(-100, -100, 26, 26)
+count = 24
+height_min = 6.0
+height_max = 8.5
+min_spacing = 1.6
+random_seed = 41
+
+[node name="BambooNE" type="Node3D" parent="BambooGroves"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Bamboo_2C"
+area = Rect2(70, -100, 26, 26)
+count = 24
+height_min = 6.0
+height_max = 8.5
+min_spacing = 1.6
+random_seed = 42
+
+[node name="BambooSE" type="Node3D" parent="BambooGroves"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Bamboo_3A"
+area = Rect2(72, 45, 26, 26)
+count = 24
+height_min = 6.0
+height_max = 8.5
+min_spacing = 1.6
+random_seed = 43
+
+[node name="BambooSW" type="Node3D" parent="BambooGroves"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Bamboo_3C"
+area = Rect2(-100, 45, 26, 26)
+count = 24
+height_min = 6.0
+height_max = 8.5
+min_spacing = 1.6
+random_seed = 44
+
+[node name="Rocks" type="Node3D" parent="."]
+
+[node name="RocksA" type="Node3D" parent="Rocks"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Rock_2"
+area = Rect2(-110, -110, 220, 220)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 14
+height_min = 1.0
+height_max = 2.4
+min_spacing = 10.0
+random_seed = 31
+collision_radius = 0.7
+collision_height = 1.2
+
+[node name="RocksB" type="Node3D" parent="Rocks"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Rock_5"
+area = Rect2(-110, -110, 220, 220)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 10
+height_min = 1.0
+height_max = 2.4
+min_spacing = 10.0
+random_seed = 32
+collision_radius = 0.7
+collision_height = 1.2
+
+[node name="RocksC" type="Node3D" parent="Rocks"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Rock_9"
+area = Rect2(-110, -110, 220, 220)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 8
+height_min = 1.5
+height_max = 3.0
+min_spacing = 12.0
+random_seed = 33
+collision_radius = 0.9
+collision_height = 1.5
+
+[node name="SmallRocks" type="Node3D" parent="Rocks"]
+script = ExtResource("1_scatter")
+scene = ExtResource("3_kit")
+piece_name = "Rock_1"
+area = Rect2(-110, -110, 220, 220)
+exclude = Array[Rect2]([Rect2(-48, -52, 96, 62)])
+count = 18
+height_min = 0.6
+height_max = 1.2
+min_spacing = 8.0
+random_seed = 34
+collision_radius = 0.4
+collision_height = 0.8

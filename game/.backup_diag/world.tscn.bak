@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://bmr0u1yku5rw4"]
+
+[ext_resource type="PackedScene" uid="uid://c5a48moyn1ywo" path="res://анимки/animation.glb" id="1_model"]
+[ext_resource type="Script" uid="uid://dii10wf5gbka0" path="res://Ресурсы/Скрипты/player_controller.gd" id="2_player"]
+[ext_resource type="PackedScene" path="res://Ресурсы/Сцены/village.tscn" id="3_village"]
+[ext_resource type="PackedScene" path="res://Ресурсы/Сцены/outskirts.tscn" id="4_outskirts"]
+[ext_resource type="Script" uid="uid://cxt7r65vogly3" path="res://Ресурсы/Скрипты/terrain.gd" id="5_terrain"]
+[ext_resource type="PackedScene" path="res://Ресурсы/Сцены/npcs.tscn" id="6_npcs"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jdy72"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gv5m4"]
+sky_top_color = Color(0.385, 0.647, 0.912, 1)
+sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+
+[sub_resource type="Sky" id="Sky_f3sb7"]
+sky_material = SubResource("ProceduralSkyMaterial_gv5m4")
+
+[sub_resource type="Environment" id="Environment_1e0w5"]
+background_mode = 2
+sky = SubResource("Sky_f3sb7")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+fog_enabled = true
+fog_density = 0.008
+fog_aerial_perspective = 0.5
+
+[node name="World" type="Node3D" unique_id=809594346]
+
+[node name="Ground" type="Node3D" parent="." unique_id=2084473347]
+script = ExtResource("5_terrain")
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=1794105709]
+script = ExtResource("2_player")
+
+[node name="animation" parent="Player" unique_id=1439371528 instance=ExtResource("1_model")]
+transform = Transform3D(100, 0, 0, 0, 7.54979e-06, 100, 0, -100, 7.54979e-06, 0, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=284287613]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_jdy72")
+
+[node name="CameraPivot" type="Node3D" parent="Player" unique_id=691850079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraPivot" unique_id=478978286]
+transform = Transform3D(1, 0, 0, 0, 0.990216, 0.13954312, 0, -0.13954312, 0.990216, 0, 0.6, 5)
+current = true
+far = 150.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=129312870]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
+light_color = Color(0.7, 0.75, 1, 1)
+light_energy = 0.5
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=759975666]
+environment = SubResource("Environment_1e0w5")
+
+[node name="Village" parent="." unique_id=1937978328 instance=ExtResource("3_village")]
+
+[node name="Outskirts" parent="." unique_id=1737716275 instance=ExtResource("4_outskirts")]
+
+[node name="Npcs" parent="." unique_id=991883421 instance=ExtResource("6_npcs")]

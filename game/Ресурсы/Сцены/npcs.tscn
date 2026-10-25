@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Ресурсы/Скрипты/npc.gd" id="1_npc"]
+[ext_resource type="PackedScene" uid="uid://c5a48moyn1ywo" path="res://анимки/animation.glb" id="2_character"]
+
+[node name="Npcs" type="Node3D"]
+
+[node name="NpcShrine" type="Node3D" parent="."]
+position = Vector3(5.5, 0, -16)
+rotation = Vector3(0, -2.3, 0)
+script = ExtResource("1_npc")
+character = ExtResource("2_character")
+npc_name = "Хранитель святилища"
+
+[node name="NpcSquare" type="Node3D" parent="."]
+position = Vector3(-4, 0, -2)
+rotation = Vector3(0, 1.0, 0)
+script = ExtResource("1_npc")
+character = ExtResource("2_character")
+npc_name = "Житель деревни"

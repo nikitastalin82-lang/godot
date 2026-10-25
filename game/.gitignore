@@ -1,0 +1,9 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+build/
+.godot-mcp/runtime/
+.godot-mcp/sessions/
+.godot-mcp/generated/
+.godot-mcp/config.json
+.godot-mcp/addon-backups/

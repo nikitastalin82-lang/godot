@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__godot__game_start",
+      "mcp__godot__runtime_screenshot",
+      "mcp__godot__game_stop",
+      "PowerShell(New-Item *)",
+      "mcp__godot__editor_get_console",
+      "PowerShell(Get-ChildItem -Path \".\" -Recurse -File | Where-Object { $_.FullName -match '[а-яА-ЯёЁ]' } | Select-Object -First 20 FullName | ForEach-Object { $_.FullName.Replace\\(\\(Get-Location\\).Path + '\\\\', ''\\) })",
+      "PowerShell($source = \"C:\\\\Games\\\\игра\"; $dest = \"C:\\\\Games\\\\game\"; if \\(Test-Path $dest\\) { Write-Output \"Destination already exists\" } else { Copy-Item -Path $source -Destination $dest -Recurse -Force; Write-Output \"Project copied to $dest\" })"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "godot-mcp-toolkit"
+  ]
+}
