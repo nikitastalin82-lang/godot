@@ -26,10 +26,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install download utilities
+      - name: Install download utilities and font support
         run: |
           apt-get update
-          apt-get install -y curl unzip
+          apt-get install -y curl unzip libfontconfig1
 
       - name: Install matching Godot export templates
         run: |
@@ -47,7 +47,7 @@ jobs:
       - name: Export Web build
         run: |
           mkdir -p game/build/web
-          godot --headless --path game --export-release "Web" game/build/web/index.html
+          godot --headless --path game --export-release "Web" build/web/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
