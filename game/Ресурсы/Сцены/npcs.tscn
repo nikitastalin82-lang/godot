@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://Ресурсы/Скрипты/npc.gd" id="1_npc"]
-[ext_resource type="PackedScene" path="res://Ресурсы/Модели/Персонажи/satoko.glb" id="2_satoko"]
+[ext_resource type="PackedScene" path="res://Модель персонажа Сатоко Кирагая/webglripper_hyper3d.ai_20261024-090446-rigged.glb" id="2_satoko"]
 
 [node name="Npcs" type="Node3D"]
 
