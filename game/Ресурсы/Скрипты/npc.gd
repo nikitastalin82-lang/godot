@@ -44,6 +44,38 @@ func _ready() -> void:
 		_player = get_tree().current_scene.find_child("Player", true, false) as Node3D
 
 
+func _build_bone_map() -> Dictionary:
+	var result := {
+		"Hips": "pelvis",
+		"Spine": "spine_01",
+		"Spine1": "spine_02",
+		"Spine2": "spine_03",
+		"Neck": "neck_01",
+		"Head": "head",
+		"HeadTop_End": "head_leaf"
+	}
+	for side in ["Left", "Right"]:
+		var suffix := "l" if side == "Left" else "r"
+		result[side + "Shoulder"] = "clavicle_" + suffix
+		result[side + "Arm"] = "upperarm_" + suffix
+		result[side + "ForeArm"] = "lowerarm_" + suffix
+		result[side + "Hand"] = "hand_" + suffix
+		result[side + "UpLeg"] = "thigh_" + suffix
+		result[side + "Leg"] = "calf_" + suffix
+		result[side + "Foot"] = "foot_" + suffix
+		result[side + "ToeBase"] = "ball_" + suffix
+		result[side + "Toe_End"] = "ball_leaf_" + suffix
+		for finger in ["Thumb", "Index", "Middle", "Ring", "Pinky"]:
+			var finger_name := finger.to_lower()
+			for segment in range(1, 5):
+				var segment_name := "%02d" % segment
+				var target_name := finger_name + "_" + segment_name
+				if segment == 4:
+					target_name += "_leaf"
+				result[side + "Hand" + finger + str(segment)] = target_name + "_" + suffix
+	return result
+
+
 func _play_idle() -> void:
 	var skeleton := _model.find_child("Skeleton3D", true, false) as Skeleton3D
 	if skeleton == null:
@@ -73,23 +105,31 @@ func _play_idle() -> void:
 		return
 
 	var target_clip := source_clip.duplicate() as Animation
+	var bone_map := _build_bone_map()
 	var mapped := 0
+	var unmapped: Array[String] = []
 	var skeleton_path := _animation_player.get_path_to(skeleton)
 	for i in range(target_clip.get_track_count()):
 		var old_path := String(target_clip.track_get_path(i))
 		var colon := old_path.rfind(":")
 		if colon == -1:
 			continue
-		var bone := old_path.substr(colon + 1)
-		if source_skeleton.find_bone(bone) == -1 or skeleton.find_bone(bone) == -1:
+		var source_bone := old_path.substr(colon + 1)
+		if source_skeleton.find_bone(source_bone) == -1:
 			continue
-		target_clip.track_set_path(i, NodePath(String(skeleton_path) + ":" + bone))
+		var target_bone: String = bone_map.get(source_bone.trim_prefix("mixamorig_"), "")
+		if target_bone.is_empty() or skeleton.find_bone(target_bone) == -1:
+			unmapped.append(source_bone)
+			continue
+		target_clip.track_set_path(i, NodePath(String(skeleton_path) + ":" + target_bone))
 		mapped += 1
 
 	source.free()
 	if mapped == 0:
-		push_warning("NPC %s: no matching bone animation tracks. Check FBX track paths." % npc_name)
+		push_warning("NPC %s: no compatible animation tracks were mapped." % npc_name)
 		return
+	if not unmapped.is_empty():
+		push_warning("NPC %s: skipped unmapped bones: %s" % [npc_name, ", ".join(unmapped)])
 
 	var library := _animation_player.get_animation_library(&"")
 	if library == null:
@@ -103,7 +143,7 @@ func _play_idle() -> void:
 		push_warning("NPC %s: could not add idle animation: %s" % [npc_name, error])
 		return
 	_animation_player.play(&"satoko_idle")
-	print("NPC %s: idle started; mapped tracks: %d" % [npc_name, mapped])
+	print("NPC %s: idle started; mapped tracks: %d/%d" % [npc_name, mapped, target_clip.get_track_count()])
 
 
 func _process(delta: float) -> void:
