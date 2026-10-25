@@ -30,35 +30,35 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24)
 script = ExtResource("1_fit")
 scene = ExtResource("2_house")
 ground_snap = false
-collision = 3
+collision = 1
 
 [node name="HouseNW" type="Node3D" parent="Houses" unique_id=1000285179]
 transform = Transform3D(0.6967067, 0, 0.7173561, 0, 1, 0, -0.7173561, 0, 0.6967067, -24, 0, 8)
 script = ExtResource("1_fit")
 scene = ExtResource("8_oldhouse")
 target_height = 5.5
-collision = 3
+collision = 1
 
 [node name="HouseNE" type="Node3D" parent="Houses" unique_id=2062266786]
 transform = Transform3D(0.6967067, 0, -0.7173561, 0, 1, 0, 0.7173561, 0, 0.6967067, 24, 0, 8)
 script = ExtResource("1_fit")
 scene = ExtResource("8_oldhouse")
 target_height = 5.5
-collision = 3
+collision = 1
 
 [node name="HouseW" type="Node3D" parent="Houses" unique_id=1855259840]
 transform = Transform3D(0.3623577, 0, 0.9320391, 0, 1, 0, -0.9320391, 0, 0.3623577, -18, 0, -3)
 script = ExtResource("1_fit")
 scene = ExtResource("8_oldhouse")
 target_height = 5.0
-collision = 3
+collision = 1
 
 [node name="HouseE" type="Node3D" parent="Houses" unique_id=1610925937]
 transform = Transform3D(0.3623577, 0, -0.9320391, 0, 1, 0, 0.9320391, 0, 0.3623577, 18, 0, -3)
 script = ExtResource("1_fit")
 scene = ExtResource("8_oldhouse")
 target_height = 5.0
-collision = 3
+collision = 1
 
 [node name="Shrine" type="Node3D" parent="." unique_id=1259150975]
 
@@ -369,28 +369,28 @@ transform = Transform3D(-1, 0, 1.509958e-07, 0, 1, 0, -1.509958e-07, 0, -1, 0, 0
 script = ExtResource("1_fit")
 scene = ExtResource("7_temple")
 target_height = 9.5
-collision = 3
+collision = 1
 
 [node name="OldHouseWest" type="Node3D" parent="Decor" unique_id=958353602]
 transform = Transform3D(-0.666276, 0, 0.74570525, 0, 1, 0, -0.74570525, 0, -0.666276, -32, 0, -44)
 script = ExtResource("1_fit")
 scene = ExtResource("8_oldhouse")
 target_height = 6.0
-collision = 3
+collision = 1
 
 [node name="OldHouseEast" type="Node3D" parent="Decor" unique_id=1326047557]
 transform = Transform3D(-0.666276, 0, -0.74570525, 0, 1, 0, 0.74570525, 0, -0.666276, 32, 0, -44)
 script = ExtResource("1_fit")
 scene = ExtResource("8_oldhouse")
 target_height = 6.0
-collision = 3
+collision = 1
 
 [node name="Bridge" type="Node3D" parent="Decor" unique_id=1753798459]
 transform = Transform3D(-1, 0, 1.509958e-07, 0, 1, 0, -1.509958e-07, 0, -1, 0, 0, 12)
 script = ExtResource("1_fit")
 scene = ExtResource("9_bridge")
 target_height = 3.0
-collision = 3
+collision = 1
 
 [node name="LanternSW" type="Node3D" parent="Decor" unique_id=1623034656]
 transform = Transform3D(-0.8568887, 0, 0.51550144, 0, 1, 0, -0.51550144, 0, -0.8568887, -4.5, 0, 12)
